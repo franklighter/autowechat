@@ -6,7 +6,6 @@ import pyautogui
 from functools import wraps
 from pywinauto import WindowSpecification,Desktop
 from pywinauto.controls.uia_controls import ListItemWrapper #TypeHint要用到
-from pywinauto.findwindows import ElementNotFoundError
 from .Config import GlobalConfig
 from .WeChatTools import Navigator,Tools
 from .WinSettings import SystemSettings
@@ -21,55 +20,6 @@ Lists=Lists()#所有List类型UI
 Windows=Windows()#所有Windows类型UI
 pyautogui.FAILSAFE=False#防止鼠标在屏幕边缘处造成的误触
 desktop=Desktop(backend='uia')
-
-def find_child_with_title_fallback(parent_window, child_spec, title_mappings=None):
-    '''
-    尝试使用不同的标题查找子窗口,支持多语言版本的微信
-    Args:
-        parent_window: 父窗口对象
-        child_spec: 子窗口规格字典
-        title_mappings: 标题映射字典,格式为 {'微信': ['微信', 'WeChat', 'Weixin']}
-    Returns:
-        找到的子窗口对象
-    '''
-    if 'title' not in child_spec:
-        return parent_window.child_window(**child_spec)
-
-    # 默认的标题映射
-    default_mappings = {
-        '微信': ['微信', 'WeChat', 'Weixin'],
-        '通讯录': ['通讯录', 'Contacts'],
-        '收藏': ['收藏', 'Favorites'],
-        '朋友圈': ['朋友圈', 'Moments'],
-        '搜一搜': ['搜一搜', 'Search'],
-        '视频号': ['视频号', 'Channels'],
-        '小程序面板': ['小程序面板', 'Mini Programs'],
-        '发现': ['发现', 'Discover'],
-        '更多': ['更多', 'More'],
-    }
-
-    if title_mappings:
-        default_mappings.update(title_mappings)
-
-    original_title = child_spec['title']
-    titles_to_try = default_mappings.get(original_title, [original_title])
-
-    last_error = None
-    for title in titles_to_try:
-        try:
-            modified_spec = child_spec.copy()
-            modified_spec['title'] = title
-            child = parent_window.child_window(**modified_spec)
-            if child.exists(timeout=0.5):
-                return child
-        except ElementNotFoundError as e:
-            last_error = e
-            continue
-
-    if last_error:
-        raise last_error
-    raise ElementNotFoundError(f"无法找到子窗口: {child_spec}")
-
 
 class Regex_Patterns():
     '''常用正则pattern'''
