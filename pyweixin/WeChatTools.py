@@ -105,7 +105,8 @@ from pywinauto.controls.uia_controls import ListViewWrapper,ListItemWrapper,Edit
 from pywinauto import WindowSpecification
 from pyweixin.Uielements import (Login_window,Main_window,SideBar,Independent_window,ListItems,
 Buttons,Texts,Menus,TabItems,Lists,Edits,Windows,Panes)
-from pyweixin.WinSettings import SystemSettings 
+from pyweixin.WinSettings import SystemSettings
+from pyweixin.utils import find_child_with_title_fallback 
 ##########################################################################################
 
 #各种UI实例化
@@ -1091,7 +1092,7 @@ class Navigator():
             close_weixin=GlobalConfig.close_weixin
 
         main_window=Navigator.open_weixin(is_maximize=is_maximize)
-        chat_button=main_window.child_window(**SideBar.Chats)
+        chat_button=find_child_with_title_fallback(main_window, SideBar.Chats)
         chat_button.click_input()
         session_list=main_window.child_window(**Main_window.ConversationList)
         search=main_window.descendants(**Main_window.Search)[0]
