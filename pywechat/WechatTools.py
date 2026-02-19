@@ -82,6 +82,37 @@ pyautogui.FAILSAFE=False#防止鼠标在屏幕边缘处造成的误触
 #pywechat内的ffmpeg.exe路径
 module_dir=os.path.dirname(os.path.abspath(__file__))
 ffmpeg_path=os.path.join(module_dir, 'ffmpeg', 'ffmpeg.exe')
+
+def find_window_with_title_fallback(desktop, window_spec):
+    '''
+    尝试使用不同的标题查找窗口,支持多语言版本的微信
+    Args:
+        desktop: Desktop对象
+        window_spec: 窗口规格字典
+    Returns:
+        找到的窗口对象
+    '''
+    if 'title' not in window_spec or window_spec['title'] != '微信':
+        return desktop.window(**window_spec)
+
+    titles_to_try = ['微信', 'WeChat', 'Weixin']
+    last_error = None
+
+    for title in titles_to_try:
+        try:
+            modified_spec = window_spec.copy()
+            modified_spec['title'] = title
+            window = desktop.window(**modified_spec)
+            if window.exists(timeout=0.5):
+                return window
+        except ElementNotFoundError as e:
+            last_error = e
+            continue
+
+    if last_error:
+        raise last_error
+    raise ElementNotFoundError(f"无法找到窗口: {window_spec}")
+
 class Tools():
     '''该类中封装了一些关于PC微信的工具
     '''
@@ -2687,7 +2718,7 @@ def open_channels(wechat_path:str=None,is_maximize:bool=True,wechat_maximize:boo
     channel_button=main_window.child_window(**SideBar.Channel)
     channel_button.click_input()
     desktop=Desktop(**Independent_window.Desktop)
-    channel_window=desktop.window(**Independent_window.ChannelWindow)
+    channel_window=find_window_with_title_fallback(desktop, Independent_window.ChannelWindow)
     if is_maximize:
         channel_window.maximize()
     if close_wechat:

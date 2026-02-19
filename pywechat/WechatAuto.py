@@ -48,7 +48,7 @@ from typing import Literal
 from .Config import GlobalConfig
 from concurrent.futures import ThreadPoolExecutor#Pytho3.2以上版本
 from .Warnings import LongTextWarning,ChatHistoryNotEnough
-from .WechatTools import Tools,mouse,Desktop
+from .WechatTools import Tools,mouse,Desktop,find_window_with_title_fallback
 from .WinSettings import SystemSettings
 from .Errors import NoWechat_number_or_Phone_numberError
 from .Errors import WeChatNotStartError
@@ -2439,7 +2439,7 @@ class FriendSettings():
         pyautogui.hotkey('ctrl','v')
         search_new_friend_result=main_window.child_window(**Main_window.SearchNewFriendResult)
         search_new_friend_result.child_window(**Texts.SearchContactsResult).double_click_input()
-        profile_pane=desktop.window(**Independent_window.ContactProfileWindow)
+        profile_pane=find_window_with_title_fallback(desktop, Independent_window.ContactProfileWindow)
         if profile_pane.exists():
             profile_pane=Tools.move_window_to_center(handle=profile_pane.handle)
             add_to_contacts=profile_pane.child_window(**Buttons.AddToContactsButton)
@@ -5166,8 +5166,8 @@ class AutoReply():
         desktop=Desktop(**Independent_window.Desktop)
         end_timestamp=time.time()+duration#根据秒数计算截止时间
         while time.time()<end_timestamp:
-            call_interface1=desktop.window(**Independent_window.OldIncomingCallWindow)
-            call_interface2=desktop.window(**Independent_window.NewIncomingCallWindow)
+            call_interface1=find_window_with_title_fallback(desktop, Independent_window.OldIncomingCallWindow)
+            call_interface2=find_window_with_title_fallback(desktop, Independent_window.NewIncomingCallWindow)
             if call_interface1.exists():
                 flag,caller_name=judge_call(call_interface1)
                 caller_names.append(caller_name)
@@ -5178,7 +5178,7 @@ class AutoReply():
                     time.sleep(1)
                     accept.click_input()
                     time.sleep(1)
-                    accept_call_window=desktop.window(**Independent_window.OldVoiceCallWindow)
+                    accept_call_window=find_window_with_title_fallback(desktop, Independent_window.OldVoiceCallWindow)
                     if accept_call_window.exists():
                         duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
                         while not duration_time.exists():
@@ -5195,7 +5195,7 @@ class AutoReply():
                     time.sleep(1)
                     accept.click_input()
                     time.sleep(1)
-                    accept_call_window=desktop.window(**Independent_window.OldVideoCallWindow)
+                    accept_call_window=find_window_with_title_fallback(desktop, Independent_window.OldVideoCallWindow)
                     accept_call_window.click_input()
                     duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
                     while not duration_time.exists():
@@ -5220,7 +5220,7 @@ class AutoReply():
                     time.sleep(1)
                     accept.click_input()
                     time.sleep(1)
-                    accept_call_window=desktop.window(**Independent_window.NewVoiceCallWindow)
+                    accept_call_window=find_window_with_title_fallback(desktop, Independent_window.NewVoiceCallWindow)
                     if accept_call_window.exists():
                         answering_window=accept_call_window.child_window(found_index=13,control_type='Pane',title='')
                         duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
@@ -5237,7 +5237,7 @@ class AutoReply():
                     time.sleep(1)
                     accept.click_input()
                     time.sleep(1)
-                    accept_call_window=desktop.window(**Independent_window.NewVideoCallWindow)
+                    accept_call_window=find_window_with_title_fallback(desktop, Independent_window.NewVideoCallWindow)
                     accept_call_window.click_input()
                     duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
                     while not duration_time.exists():
@@ -6666,8 +6666,8 @@ def auto_answer_call(duration:str,broadcast_content:str,message:str=None,times:i
     SystemSettings.open_listening_mode(full_volume=True)
     end_timestamp=time.time()+duration#根据秒数计算截止时间
     while time.time()<end_timestamp:
-        call_interface1=desktop.window(**Independent_window.OldIncomingCallWindow)
-        call_interface2=desktop.window(**Independent_window.NewIncomingCallWindow)
+        call_interface1=find_window_with_title_fallback(desktop, Independent_window.OldIncomingCallWindow)
+        call_interface2=find_window_with_title_fallback(desktop, Independent_window.NewIncomingCallWindow)
         if call_interface1.exists():
             flag,caller_name=judge_call(call_interface1)
             caller_names.append(caller_name)
@@ -6678,7 +6678,7 @@ def auto_answer_call(duration:str,broadcast_content:str,message:str=None,times:i
                 time.sleep(1)
                 accept.click_input()
                 time.sleep(1)
-                accept_call_window=desktop.window(**Independent_window.OldVoiceCallWindow)
+                accept_call_window=find_window_with_title_fallback(desktop, Independent_window.OldVoiceCallWindow)
                 if accept_call_window.exists():
                     duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
                     while not duration_time.exists():
@@ -6695,7 +6695,7 @@ def auto_answer_call(duration:str,broadcast_content:str,message:str=None,times:i
                 time.sleep(1)
                 accept.click_input()
                 time.sleep(1)
-                accept_call_window=desktop.window(**Independent_window.OldVideoCallWindow)
+                accept_call_window=find_window_with_title_fallback(desktop, Independent_window.OldVideoCallWindow)
                 accept_call_window.click_input()
                 duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
                 while not duration_time.exists():
@@ -6720,7 +6720,7 @@ def auto_answer_call(duration:str,broadcast_content:str,message:str=None,times:i
                 time.sleep(1)
                 accept.click_input()
                 time.sleep(1)
-                accept_call_window=desktop.window(**Independent_window.NewVoiceCallWindow)
+                accept_call_window=find_window_with_title_fallback(desktop, Independent_window.NewVoiceCallWindow)
                 if accept_call_window.exists():
                     answering_window=accept_call_window.child_window(found_index=13,control_type='Pane',title='')
                     duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
@@ -6737,7 +6737,7 @@ def auto_answer_call(duration:str,broadcast_content:str,message:str=None,times:i
                 time.sleep(1)
                 accept.click_input()
                 time.sleep(1)
-                accept_call_window=desktop.window(**Independent_window.NewVideoCallWindow)
+                accept_call_window=find_window_with_title_fallback(desktop, Independent_window.NewVideoCallWindow)
                 accept_call_window.click_input()
                 duration_time=accept_call_window.child_window(title_re='00:',control_type='Text')
                 while not duration_time.exists():
@@ -7596,7 +7596,7 @@ def add_new_friend(wechat_number:str,request_content:str=None,wechat_path:str=No
     pyautogui.hotkey('ctrl','v')
     search_new_friend_result=main_window.child_window(**Main_window.SearchNewFriendResult)
     search_new_friend_result.child_window(**Texts.SearchContactsResult).double_click_input()
-    profile_pane=desktop.window(**Independent_window.ContactProfileWindow)
+    profile_pane=find_window_with_title_fallback(desktop, Independent_window.ContactProfileWindow)
     if profile_pane.exists():
         profile_pane=Tools.move_window_to_center(handle=profile_pane.handle)
         add_to_contacts=profile_pane.child_window(**Buttons.AddToContactsButton)
